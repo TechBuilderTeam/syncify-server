@@ -58,6 +58,7 @@ urlpatterns = [
 # * ====================== important urls ==================== 
     path('counts/', count_view, name='counts'),
     path('dashbordinfo/<int:workspace_id>/', WorkspaceInfoAPIView.as_view(), name='workspace-info'),
+    path('pdf/<int:workspace_id>/', WorkspacePDFView.as_view(), name='workspace_pdf'),
 
 ]
 

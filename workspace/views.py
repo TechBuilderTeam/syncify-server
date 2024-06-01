@@ -12,6 +12,9 @@ from django.db.models import Avg, Max, Min
 from rest_framework.exceptions import NotFound
 from rest_framework import filters
 from django.http import JsonResponse
+from django.http import HttpResponse
+from .pdf_generator import generate_workspace_pdf
+
 
 #* ============ There will be All the Functions of the WorkSpace   ============ *# 
 
@@ -415,3 +418,11 @@ class WorkspaceInfoAPIView(APIView):
 
         serializer = WorkspaceInfoSerializer(data)
         return Response(serializer.data)
+    
+
+class WorkspacePDFView(APIView):
+    def get(self, request, workspace_id, *args, **kwargs):
+        pdf = generate_workspace_pdf(workspace_id)
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="workspace_{workspace_id}.pdf"'
+        return response

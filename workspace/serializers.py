@@ -104,10 +104,16 @@ class MemberSerializerForRoleFind(serializers.ModelSerializer):
 
 
 # * ================ This Serializer is for the Scrum ================ * #
+class ScrumTimelineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Timeline
+        fields = ['id', 'name']
+
 class ScrumSerializer(serializers.ModelSerializer):
+    timeline_Name = ScrumTimelineSerializer(read_only=True)
     class Meta:
         model = Scrum
-        fields = ['timeline_Name', 'name', 'details']
+        fields = ['id', 'name', 'details','timeline_Name']
 
 class CreateScrumSerializer(serializers.ModelSerializer):
     class Meta:
