@@ -39,6 +39,7 @@ class AssignedUserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', read_only=True)
     last_name = serializers.CharField(source='user.last_name', read_only=True)
     email = serializers.EmailField(source='user.email', read_only=True)
+    id = serializers.EmailField(source='user.id', read_only=True)
 
     class Meta:
         model = Member
@@ -127,7 +128,12 @@ class CreateScrumSerializer(serializers.ModelSerializer):
         fields = ['timeline_Name', 'name', 'details']
 
     def create(self, validated_data):
+        timeline = validated_data.get('timeline_Name')
+        if timeline and timeline.assign:
+            validated_data['members'] = timeline.assign
+        
         return Scrum.objects.create(**validated_data)
+
 
 # * ================ This Serializer is for the Task ================ * #
 # class TaskCreationSerializer(serializers.ModelSerializer):
@@ -318,3 +324,12 @@ class WorkspaceDetailsForMembers(serializers.ModelSerializer):
 
     def get_workspace_total_members(self, obj):
         return Member.objects.filter(workspace_Name=obj).count()
+    
+
+
+class ScrumWithTasksSerializer(serializers.ModelSerializer):
+    tasks = TaskDetailSerializer(source='task_set', many=True, read_only=True)
+
+    class Meta:
+        model = Scrum
+        fields = ['id', 'name', 'tasks']
