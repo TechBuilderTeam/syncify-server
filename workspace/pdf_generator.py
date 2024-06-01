@@ -29,6 +29,7 @@ def generate_workspace_pdf(workspace_id):
         canvas.drawCentredString(width / 2, y + 5, "Thanks For Working With Project Syncify")
         canvas.line(30, y, width - 30, y)
 
+    # Draw header only on the first page
     draw_header(p)
 
     # Title
@@ -85,15 +86,22 @@ def generate_workspace_pdf(workspace_id):
                 ])
             draw_table(p, task_data, width, p._curr_y - 50, "Tasks:")
 
-            # Task comments
+    # Move to the next page for task comments
+    p.showPage()
+
+    # Task comments on the second page
+    for timeline in Timeline.objects.filter(workspace_Name=workspace):
+        scrums = Scrum.objects.filter(timeline_Name=timeline)
+        for scrum in scrums:
+            tasks = Task.objects.filter(scrum_Name=scrum)
             for task in tasks:
                 comments = TaskComment.objects.filter(task_Name=task)
                 comment_data = [["Task Name", "Comment", "Created", "Commenter Name"]]
                 for comment in comments:
                     comment_data.append([task.name, comment.comment, comment.created, comment.commenter.user.first_name])
-                draw_table(p, comment_data, width, p._curr_y - 50, "Task Comments:")
+                draw_table(p, comment_data, width, height - 50, "Task Comments:")
 
-    # Draw footer
+    # Draw footer on the second page
     draw_footer(p)
 
     p.showPage()
