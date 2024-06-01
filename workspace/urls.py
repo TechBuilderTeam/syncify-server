@@ -37,6 +37,7 @@ urlpatterns = [
     path('scrum/update/<int:pk>/', ScrumUpdateAPIView.as_view(), name='update-scrum'),
     path('scrum/delete/<int:pk>/', ScrumDeleteAPIView.as_view(), name='delete-scrum'),
     path('timeline/scrum/<int:timeline_id>/', ScrumListByTimelineAPIView.as_view(), name='scrums-by-timeline'),
+    path('user/<int:user_id>/workspace/<int:workspace_id>/scrums/', UserWorkspaceScrumListAPIView.as_view(), name='user-workspace-scrum-list'),
 
 # * ================= Task URLS ================================
     path('tasks/create/', TaskCreateView.as_view(), name='task-create'),
