@@ -326,10 +326,11 @@ class WorkspaceDetailsForMembers(serializers.ModelSerializer):
         return Member.objects.filter(workspace_Name=obj).count()
     
 
-
 class ScrumWithTasksSerializer(serializers.ModelSerializer):
     tasks = TaskDetailSerializer(source='task_set', many=True, read_only=True)
+    timeline_name = serializers.CharField(source='timeline_Name.name', read_only=True)
+    assign = AssignedUserSerializer(source='timeline_Name.assign', read_only=True)
 
     class Meta:
         model = Scrum
-        fields = ['id', 'name', 'tasks']
+        fields = ['id', 'name', 'timeline_name', 'assign', 'tasks']
