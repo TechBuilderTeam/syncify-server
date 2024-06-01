@@ -124,18 +124,68 @@ class CreateScrumSerializer(serializers.ModelSerializer):
         return Scrum.objects.create(**validated_data)
 
 # * ================ This Serializer is for the Task ================ * #
+# class TaskCreationSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Task
+#         fields = ['scrum_Name', 'name', 'details', 'assign']
+#         read_only_fields = ['status', 'priority', 'which_Type', 'task_Value']
+
+#     def create(self, validated_data):
+#         validated_data['status'] = Task_Status.TO_DO
+#         validated_data['priority'] = TaskPriority.LOW
+#         validated_data['which_Type'] = TaskType.TASK
+#         validated_data['task_Value'] = None
+#         return super().create(validated_data)
+
 class TaskCreationSerializer(serializers.ModelSerializer):
+    assign = serializers.EmailField(write_only=True, required=False)
+
     class Meta:
         model = Task
         fields = ['scrum_Name', 'name', 'details', 'assign']
         read_only_fields = ['status', 'priority', 'which_Type', 'task_Value']
 
+    def validate_assign(self, value):
+        if value:
+            try:
+                # Ensure case-insensitive email lookup
+                user = User.objects.get(email__iexact=value)
+            except User.DoesNotExist:
+                raise serializers.ValidationError("No user found with this email address.")
+            
+            # Check if the user is a member of the workspace related to the Task instance's Scrum's Timeline's Workspace
+            try:
+                scrum_id = self.initial_data.get('scrum_Name')
+                scrum = Scrum.objects.get(id=scrum_id)
+                timeline = scrum.timeline_Name
+                workspace = timeline.workspace_Name
+            except Scrum.DoesNotExist:
+                raise serializers.ValidationError("Scrum not found.")
+            except Timeline.DoesNotExist:
+                raise serializers.ValidationError("Timeline not found.")
+            except WorkSpace.DoesNotExist:
+                raise serializers.ValidationError("Workspace not found.")
+            except Exception as e:
+                raise serializers.ValidationError(str(e))
+
+            try:
+                member = Member.objects.get(user=user, workspace_Name=workspace)
+            except Member.DoesNotExist:
+                raise serializers.ValidationError("User is not a member of the workspace.")
+            
+            return member
+        return None
+
     def create(self, validated_data):
+        assign_member = validated_data.pop('assign', None)
+        if assign_member:
+            validated_data['assign'] = assign_member
         validated_data['status'] = Task_Status.TO_DO
         validated_data['priority'] = TaskPriority.LOW
         validated_data['which_Type'] = TaskType.TASK
         validated_data['task_Value'] = None
         return super().create(validated_data)
+
 
 class TaskDetailSerializer(serializers.ModelSerializer):
     assign = AssignedUserSerializer(read_only=True)
