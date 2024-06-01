@@ -26,6 +26,12 @@ class TimelineCreationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Automatically set the status to "To Do"
         validated_data['status'] = Timeline_Status.TO_DO
+        # Calculate remaining time
+        end_date = validated_data.get('end_Date')
+        if end_date:
+            remaining_days = (end_date - date.today()).days
+            validated_data['remaining_time'] = remaining_days if remaining_days >= 0 else 0
+
         return super().create(validated_data)
 
 # * ================ This Serializer is for the Get the Timeline  ================ * #
