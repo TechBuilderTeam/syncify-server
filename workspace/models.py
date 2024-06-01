@@ -117,4 +117,4 @@ class TaskComment(models.Model):
     commenter = models.ForeignKey(Member, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return f"Commenter Name: {self.commernter.user}"
+        return f"Commenter Name: {self.commenter.user}"
