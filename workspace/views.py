@@ -354,6 +354,28 @@ def user_position_in_workspace(request, user_id, workspace_id):
     except Member.DoesNotExist:
         return Response({"message": "Member not found in the specified workspace"}, status=404)
 
+class UserWorkspaceTaskListAPIView(APIView):
+    def get(self, request, user_id, workspace_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            raise NotFound("User not found")
+
+        try:
+            workspace = WorkSpace.objects.get(id=workspace_id)
+        except WorkSpace.DoesNotExist:
+            raise NotFound("Workspace not found")
+
+        try:
+            member = Member.objects.get(user=user, workspace_Name=workspace)
+        except Member.DoesNotExist:
+            raise NotFound("User is not a member of the workspace")
+
+        tasks = Task.objects.filter(assign=member, scrum_Name__timeline_Name__workspace_Name=workspace)
+        task_data = TaskDetailSerializer(tasks, many=True).data
+
+        return Response(task_data)
+
 #* ============== This function for change the task priority =====================*#
 class TaskPriorityUpdateView(generics.UpdateAPIView):
     queryset = Task.objects.all()
@@ -448,7 +470,7 @@ class WorkspaceInfoAPIView(APIView):
 
         serializer = WorkspaceInfoSerializer(data)
         return Response(serializer.data)
-    
+
 
 class WorkspacePDFView(APIView):
     def get(self, request, workspace_id, *args, **kwargs):
@@ -456,3 +478,5 @@ class WorkspacePDFView(APIView):
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="workspace_{workspace_id}.pdf"'
         return response
+
+
