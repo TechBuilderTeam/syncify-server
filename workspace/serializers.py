@@ -150,12 +150,12 @@ class CreateScrumSerializer(serializers.ModelSerializer):
 #         return super().create(validated_data)
 
 class TaskCreationSerializer(serializers.ModelSerializer):
-    assign = serializers.EmailField(write_only=True, required=False)
+    assign = serializers.EmailField(write_only=True, required=False, allow_blank=True)
 
     class Meta:
         model = Task
-        fields = ['scrum_Name', 'name', 'details', 'assign']
-        read_only_fields = ['status', 'priority', 'which_Type', 'task_Value']
+        fields = ['scrum_Name', 'name', 'details', 'assign','which_Type']
+        read_only_fields = ['status', 'priority', 'task_Value']
 
     def validate_assign(self, value):
         if value:
@@ -194,7 +194,6 @@ class TaskCreationSerializer(serializers.ModelSerializer):
             validated_data['assign'] = assign_member
         validated_data['status'] = Task_Status.TO_DO
         validated_data['priority'] = TaskPriority.LOW
-        validated_data['which_Type'] = TaskType.TASK
         validated_data['task_Value'] = None
         return super().create(validated_data)
 
