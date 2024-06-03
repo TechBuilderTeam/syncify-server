@@ -27,9 +27,11 @@ class ScrumConsumer(AsyncJsonWebsocketConsumer):
     async def receive_json(self,content,**kwargs):
         self.message=content['message']
         self.user=content['user']
+        myuser=await database_sync_to_async(User.objects.get)(id=self.user)
         print(self.message)
         db_group=await database_sync_to_async(ChatGroup.objects.get)(groupname=self.group)
         chat=Chat(
+            user=myuser,
             username=self.user,
             message=self.message,
             group=db_group
@@ -42,6 +44,9 @@ class ScrumConsumer(AsyncJsonWebsocketConsumer):
             'message':self.message,
             'user':self.user,
             'username':myuser.get_full_name,
+            'user_image':myuser.image,
+            'user_first_name':myuser.first_name,
+            'user_last_name':myuser.last_name,
             'timestamp':timezone.now().isoformat()
         })
         
@@ -50,8 +55,48 @@ class ScrumConsumer(AsyncJsonWebsocketConsumer):
             'message':event['message'],
             'user':event['user'],
             'username':event['username'],
+            'user_image':event['user_image'],
+            'user_first_name':event['user_first_name'],
+            'user_last_name':event['user_last_name'],
             'timestamp':event['timestamp']
         })
+        
+        
+class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
+    async def connect(self):
+        self.group='commonUserGroup'
+        await self.channel_layer.group_add(self.group,self.channel_name)
+        print('websocket connected ...')
+        await self.accept()
+        
+    async def disconnect(self, close_code):
+        print('websocket closed ...')
+        await self.channel_layer.group_discard(self.group,self.channel_name)
+        
+    async def receive_json(self,content,**kwargs):
+        self.status=content['status']
+        self.user_id=content['user_id']
+        await self.update_status(self.user_id,self.status)
+        
+    @database_sync_to_async
+    def update_status(self,user_id,status):
+        user=User.objects.get(id=user_id)
+        onlineStatus=UserOnlineStatus.objects.get(user=user)
+        if status=='online':
+            onlineStatus.status=True
+            onlineStatus.save()
+        else:
+            onlineStatus.status=False
+            onlineStatus.save()
+            
+    async def send_onlineStatus(self,event):
+        data=json.loads(event.get('value'))
+        user=data['user']
+        status=data['user_status']
+        await self.send(text_data=json.dumps({
+            'user':user,
+            'user_status':status,
+        }))
     
 
    
