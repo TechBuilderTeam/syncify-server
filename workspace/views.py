@@ -14,7 +14,7 @@ from rest_framework import filters
 from django.http import JsonResponse
 from django.http import HttpResponse
 from .pdf_generator import generate_workspace_pdf
-
+from rest_framework.exceptions import NotFound
 
 #* ============ There will be All the Functions of the WorkSpace   ============ *# 
 
@@ -218,6 +218,36 @@ class ScrumListByTimelineAPIView(generics.ListAPIView):
         timeline_id = self.kwargs['timeline_id']
         return Scrum.objects.filter(timeline_Name_id=timeline_id)
 
+class UserWorkspaceScrumListAPIView(APIView):
+    def get(self, request, user_id, workspace_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            raise NotFound("User not found")
+
+        try:
+            workspace = WorkSpace.objects.get(id=workspace_id)
+        except WorkSpace.DoesNotExist:
+            raise NotFound("Workspace not found")
+
+        try:
+            member = Member.objects.get(user=user, workspace_Name=workspace)
+        except Member.DoesNotExist:
+            raise NotFound("User is not a member of the workspace")
+
+        scrums = Scrum.objects.filter(timeline_Name__workspace_Name=workspace, timeline_Name__assign=member)
+        
+        scrums_with_tasks = []
+        for scrum in scrums:
+            tasks = Task.objects.filter(scrum_Name=scrum)
+            task_data = TaskDetailSerializer(tasks, many=True).data
+            scrum_data = ScrumWithTasksSerializer(scrum).data
+            scrum_data['tasks'] = task_data
+            scrums_with_tasks.append(scrum_data)
+
+        return Response(scrums_with_tasks)
+
+
 # * ============== Create Task =================
 class TaskCreateView(generics.CreateAPIView):
     queryset = Task.objects.all()
@@ -324,6 +354,28 @@ def user_position_in_workspace(request, user_id, workspace_id):
     except Member.DoesNotExist:
         return Response({"message": "Member not found in the specified workspace"}, status=404)
 
+class UserWorkspaceTaskListAPIView(APIView):
+    def get(self, request, user_id, workspace_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            raise NotFound("User not found")
+
+        try:
+            workspace = WorkSpace.objects.get(id=workspace_id)
+        except WorkSpace.DoesNotExist:
+            raise NotFound("Workspace not found")
+
+        try:
+            member = Member.objects.get(user=user, workspace_Name=workspace)
+        except Member.DoesNotExist:
+            raise NotFound("User is not a member of the workspace")
+
+        tasks = Task.objects.filter(assign=member, scrum_Name__timeline_Name__workspace_Name=workspace)
+        task_data = TaskDetailSerializer(tasks, many=True).data
+
+        return Response(task_data)
+
 #* ============== This function for change the task priority =====================*#
 class TaskPriorityUpdateView(generics.UpdateAPIView):
     queryset = Task.objects.all()
@@ -418,7 +470,7 @@ class WorkspaceInfoAPIView(APIView):
 
         serializer = WorkspaceInfoSerializer(data)
         return Response(serializer.data)
-    
+
 
 class WorkspacePDFView(APIView):
     def get(self, request, workspace_id, *args, **kwargs):
@@ -426,3 +478,5 @@ class WorkspacePDFView(APIView):
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="workspace_{workspace_id}.pdf"'
         return response
+
+

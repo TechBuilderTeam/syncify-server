@@ -39,6 +39,7 @@ class AssignedUserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', read_only=True)
     last_name = serializers.CharField(source='user.last_name', read_only=True)
     email = serializers.EmailField(source='user.email', read_only=True)
+    id = serializers.EmailField(source='user.id', read_only=True)
 
     class Meta:
         model = Member
@@ -127,7 +128,12 @@ class CreateScrumSerializer(serializers.ModelSerializer):
         fields = ['timeline_Name', 'name', 'details']
 
     def create(self, validated_data):
+        timeline = validated_data.get('timeline_Name')
+        if timeline and timeline.assign:
+            validated_data['members'] = timeline.assign
+        
         return Scrum.objects.create(**validated_data)
+
 
 # * ================ This Serializer is for the Task ================ * #
 # class TaskCreationSerializer(serializers.ModelSerializer):
@@ -144,12 +150,12 @@ class CreateScrumSerializer(serializers.ModelSerializer):
 #         return super().create(validated_data)
 
 class TaskCreationSerializer(serializers.ModelSerializer):
-    assign = serializers.EmailField(write_only=True, required=False)
+    assign = serializers.EmailField(write_only=True, required=False, allow_blank=True)
 
     class Meta:
         model = Task
-        fields = ['scrum_Name', 'name', 'details', 'assign']
-        read_only_fields = ['status', 'priority', 'which_Type', 'task_Value']
+        fields = ['scrum_Name', 'name', 'details', 'assign','which_Type']
+        read_only_fields = ['status', 'priority', 'task_Value']
 
     def validate_assign(self, value):
         if value:
@@ -188,7 +194,6 @@ class TaskCreationSerializer(serializers.ModelSerializer):
             validated_data['assign'] = assign_member
         validated_data['status'] = Task_Status.TO_DO
         validated_data['priority'] = TaskPriority.LOW
-        validated_data['which_Type'] = TaskType.TASK
         validated_data['task_Value'] = None
         return super().create(validated_data)
 
@@ -318,3 +323,13 @@ class WorkspaceDetailsForMembers(serializers.ModelSerializer):
 
     def get_workspace_total_members(self, obj):
         return Member.objects.filter(workspace_Name=obj).count()
+    
+
+class ScrumWithTasksSerializer(serializers.ModelSerializer):
+    tasks = TaskDetailSerializer(source='task_set', many=True, read_only=True)
+    timeline_name = serializers.CharField(source='timeline_Name.name', read_only=True)
+    assign = AssignedUserSerializer(source='timeline_Name.assign', read_only=True)
+
+    class Meta:
+        model = Scrum
+        fields = ['id', 'name', 'timeline_name', 'assign', 'tasks']

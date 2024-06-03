@@ -37,6 +37,7 @@ urlpatterns = [
     path('scrum/update/<int:pk>/', ScrumUpdateAPIView.as_view(), name='update-scrum'),
     path('scrum/delete/<int:pk>/', ScrumDeleteAPIView.as_view(), name='delete-scrum'),
     path('timeline/scrum/<int:timeline_id>/', ScrumListByTimelineAPIView.as_view(), name='scrums-by-timeline'),
+    path('user/<int:user_id>/workspace/<int:workspace_id>/scrums/', UserWorkspaceScrumListAPIView.as_view(), name='user-workspace-scrum-list'),
 
 # * ================= Task URLS ================================
     path('tasks/create/', TaskCreateView.as_view(), name='task-create'),
@@ -47,7 +48,7 @@ urlpatterns = [
     path('task/update/assign/<int:pk>/', TaskUpdateAssignedUserView.as_view(), name='task-update-assign'),
     path('task/update/priority/<int:pk>/', TaskPriorityUpdateView.as_view(), name='task-priority-update'),
     path('task/update/status/<int:pk>/', TaskStatusUpdateView.as_view(), name='task-priority-update'),
-    
+    path('user/<int:user_id>/workspace/<int:workspace_id>/tasks/', UserWorkspaceTaskListAPIView.as_view(), name='user-workspace-tasks'),
 # * ================= Task Comments URLS ================================
     path('comments/create/', TaskCommentCreateView.as_view(), name='comment-create'),
     path('comments/<int:pk>/', TaskCommentDetailView.as_view(), name='comment-detail'),
