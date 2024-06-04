@@ -30,6 +30,7 @@ urlpatterns = [
     path('timelines/update/status/<int:pk>/', UpdateTimelineStatusView.as_view(), name='update-timeline-status'),
     path('timelines/update/assign/<int:pk>/', TimelineAssignUpdate.as_view(), name='update-timeline-assign'),
     path('singleworkspace/<int:workspace_id>/timelines/list/', WorkspaceTimelinesList.as_view(), name='workspace-timelines'),
+    path('get-timeline-dates/<int:workspace_id>/',TimelineGetDates.as_view(), name='get-timeline-dates'),
 
 # * ================= Scrum URLS ================================
     path('scrum/create/', ScrumCreateAPIView.as_view(), name='create-scrum'),

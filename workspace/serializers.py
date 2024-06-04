@@ -124,18 +124,6 @@ class ScrumSerializer(serializers.ModelSerializer):
         model = Scrum
         fields = ['id', 'name', 'details','timeline_Name']
 
-# class CreateScrumSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Scrum
-#         fields = ['timeline_Name', 'name', 'details']
-
-#     def create(self, validated_data):
-#         timeline = validated_data.get('timeline_Name')
-#         if timeline and timeline.assign:
-#             validated_data['members'].set(timeline.assign)
-        
-#         return Scrum.objects.create(**validated_data)
-
 
 class CreateScrumSerializer(serializers.ModelSerializer):
     class Meta:
@@ -364,3 +352,9 @@ class ScrumWithTasksSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scrum
         fields = ['id', 'name', 'timeline_name', 'assign', 'tasks']
+
+
+class TimelineDateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Timeline
+        fields = ['id', 'name', 'start_Date', 'end_Date']
