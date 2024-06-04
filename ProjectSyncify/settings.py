@@ -176,6 +176,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REDIS_URL = 'redis://red-cpcm9ka1hbls73c8l3lg:6379'
 parsed_url = urlparse(REDIS_URL)
+           #* For Production *#
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
@@ -190,6 +191,16 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+                    #* For localHost *#
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
 
 # DATABASES = {
 #     'default': {
