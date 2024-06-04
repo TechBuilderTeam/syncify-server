@@ -149,12 +149,15 @@ class CreateScrumSerializer(serializers.ModelSerializer):
 #         validated_data['task_Value'] = None
 #         return super().create(validated_data)
 
+# serializers.py
+
+# serializers.py
 class TaskCreationSerializer(serializers.ModelSerializer):
     assign = serializers.EmailField(write_only=True, required=False, allow_blank=True)
 
     class Meta:
         model = Task
-        fields = ['scrum_Name', 'name', 'details', 'assign','which_Type']
+        fields = ['scrum_Name', 'name', 'details', 'assign', 'which_Type']
         read_only_fields = ['status', 'priority', 'task_Value']
 
     def validate_assign(self, value):
@@ -191,7 +194,17 @@ class TaskCreationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         assign_member = validated_data.pop('assign', None)
         if assign_member:
+            scrum = validated_data.get('scrum_Name')
+            if assign_member not in scrum.members.all():
+                scrum.members.add(assign_member)
+                print(f"Added member {assign_member.user.email} to scrum {scrum.name}")
+            else:
+                print(f"Member {assign_member.user.email} is already in scrum {scrum.name}")
+
             validated_data['assign'] = assign_member
+        else:
+            print("No member assigned")
+
         validated_data['status'] = Task_Status.TO_DO
         validated_data['priority'] = TaskPriority.LOW
         validated_data['task_Value'] = None
