@@ -67,14 +67,13 @@ class Timeline(models.Model):
 
 # * ==================== * This is Scrum Model * =========================== * #
 class Scrum(models.Model):
-    timeline_Name = models.OneToOneField(Timeline, on_delete=models.CASCADE,null=True)
+    timeline_Name = models.OneToOneField(Timeline, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=250)
     details = models.TextField()
-    members = models.ForeignKey(Member, on_delete=models.CASCADE,blank=True, null=True)
+    members = models.ManyToManyField(Member, blank=True)
 
     def __str__(self):
         return f"Scrum Name: {self.name}"
-    
 
 # * ==================== * This is Task Model * =========================== * #
 class Task_Status(models.TextChoices):

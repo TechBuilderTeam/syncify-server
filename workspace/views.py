@@ -217,7 +217,7 @@ class ScrumListByTimelineAPIView(generics.ListAPIView):
     def get_queryset(self):
         timeline_id = self.kwargs['timeline_id']
         return Scrum.objects.filter(timeline_Name_id=timeline_id)
-
+        
 class UserWorkspaceScrumListAPIView(APIView):
     def get(self, request, user_id, workspace_id):
         try:
@@ -230,13 +230,21 @@ class UserWorkspaceScrumListAPIView(APIView):
         except WorkSpace.DoesNotExist:
             raise NotFound("Workspace not found")
 
-        try:
-            member = Member.objects.get(user=user, workspace_Name=workspace)
-        except Member.DoesNotExist:
-            raise NotFound("User is not a member of the workspace")
+        # Check if the user is the manager of the workspace
+        is_manager = workspace.workSpace_manager == user
 
-        scrums = Scrum.objects.filter(timeline_Name__workspace_Name=workspace, timeline_Name__assign=member)
-        
+        if is_manager:
+            # Fetch all scrums in the workspace if the user is the manager
+            scrums = Scrum.objects.filter(timeline_Name__workspace_Name=workspace)
+        else:
+            try:
+                member = Member.objects.get(user=user, workspace_Name=workspace)
+            except Member.DoesNotExist:
+                raise NotFound("User is not a member of the workspace")
+
+            # Fetch all scrums in the specific workspace where the user is a member
+            scrums = Scrum.objects.filter(timeline_Name__workspace_Name=workspace, members=member).distinct()
+
         scrums_with_tasks = []
         for scrum in scrums:
             tasks = Task.objects.filter(scrum_Name=scrum)
@@ -246,8 +254,7 @@ class UserWorkspaceScrumListAPIView(APIView):
             scrums_with_tasks.append(scrum_data)
 
         return Response(scrums_with_tasks)
-
-
+    
 # * ============== Create Task =================
 class TaskCreateView(generics.CreateAPIView):
     queryset = Task.objects.all()
