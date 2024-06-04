@@ -139,6 +139,7 @@ class WorkspaceInsightsView(APIView):
     def get(self, request, workspace_id, format=None):
         # Get the workspace
         workspace = get_object_or_404(WorkSpace, id=workspace_id)
+        workspaceName=workspace.name
 
         # Total number of members in the workspace
         totalMembers = Member.objects.filter(workspace_Name=workspace).count()
@@ -172,6 +173,7 @@ class WorkspaceInsightsView(APIView):
         }
 
         data = {
+            'workspaceName':workspaceName,
             'totaMembers': totalMembers,
             'members': members,
             'totalTimelines': totalTimelines,
