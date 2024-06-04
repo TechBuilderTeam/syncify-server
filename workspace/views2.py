@@ -6,11 +6,11 @@ from django.db.models import Case, When, Value, IntegerField
 from .utils import *
 from accounts.models import User
 from django.utils.encoding import force_str
-from django.shortcuts import redirect
+from django.shortcuts import redirect,get_object_or_404
 from .serializers2 import *
 from django.core.signing import SignatureExpired
 from .models import Task_Status
-
+from rest_framework.views import APIView
 # Add new member to  workspaces
 class AddMember(generics.GenericAPIView):
     #method: POST, body: workspace_name=workspace.id,user,role
@@ -133,3 +133,51 @@ class WorkSpaceDetailView(generics.RetrieveAPIView):
     queryset = WorkSpace.objects.all()
     serializer_class = WorkspaceDetailsSerializer
     lookup_field = 'pk'
+
+class WorkspaceInsightsView(APIView):
+
+    def get(self, request, workspace_id, format=None):
+        # Get the workspace
+        workspace = get_object_or_404(WorkSpace, id=workspace_id)
+
+        # Total number of members in the workspace
+        totalMembers = Member.objects.filter(workspace_Name=workspace).count()
+        
+        # Members with roles in the workspace
+        members = {
+            'Associate Manager': Member.objects.filter(workspace_Name=workspace, role='Associate Manager').count(),
+            'Team Leader': Member.objects.filter(workspace_Name=workspace, role='Team Leader').count(),
+            'Member': Member.objects.filter(workspace_Name=workspace, role='Member').count(),
+        }
+
+        # Total number of timelines in the workspace
+        totalTimelines = Timeline.objects.filter(workspace_Name=workspace).count()
+
+        # Number of timelines based on status in the workspace
+        timelines= {
+            'In Progress': Timeline.objects.filter(workspace_Name=workspace, status='In Progress').count(),
+            'To Do': Timeline.objects.filter(workspace_Name=workspace, status='To Do').count(),
+            'Testing': Timeline.objects.filter(workspace_Name=workspace, status='Testing').count(),
+            'Done': Timeline.objects.filter(workspace_Name=workspace, status='Done').count(),
+        }
+
+        # Total number of tasks in the workspace
+        totalTasks = Task.objects.filter(scrum_Name__timeline_Name__workspace_Name=workspace).count()
+
+        # Number of tasks based on status in the workspace
+        tasks = {
+            'In Progress': Task.objects.filter(scrum_Name__timeline_Name__workspace_Name=workspace, status='In Progress').count(),
+            'To Do': Task.objects.filter(scrum_Name__timeline_Name__workspace_Name=workspace, status='To Do').count(),
+            'Done': Task.objects.filter(scrum_Name__timeline_Name__workspace_Name=workspace, status='Done').count(),
+        }
+
+        data = {
+            'totaMembers': totalMembers,
+            'members': members,
+            'totalTimelines': totalTimelines,
+            'timelines': timelines,
+            'totalTasks': totalTasks,
+            'tasks': tasks,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
