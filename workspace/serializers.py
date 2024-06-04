@@ -26,6 +26,12 @@ class TimelineCreationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Automatically set the status to "To Do"
         validated_data['status'] = Timeline_Status.TO_DO
+        # Calculate remaining time
+        end_date = validated_data.get('end_Date')
+        if end_date:
+            remaining_days = (end_date - date.today()).days
+            validated_data['remaining_time'] = remaining_days if remaining_days >= 0 else 0
+
         return super().create(validated_data)
 
 # * ================ This Serializer is for the Get the Timeline  ================ * #
@@ -33,6 +39,7 @@ class AssignedUserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', read_only=True)
     last_name = serializers.CharField(source='user.last_name', read_only=True)
     email = serializers.EmailField(source='user.email', read_only=True)
+    id = serializers.EmailField(source='user.id', read_only=True)
 
     class Meta:
         model = Member
@@ -104,10 +111,16 @@ class MemberSerializerForRoleFind(serializers.ModelSerializer):
 
 
 # * ================ This Serializer is for the Scrum ================ * #
+class ScrumTimelineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Timeline
+        fields = ['id', 'name']
+
 class ScrumSerializer(serializers.ModelSerializer):
+    timeline_Name = ScrumTimelineSerializer(read_only=True)
     class Meta:
         model = Scrum
-        fields = ['timeline_Name', 'name', 'details']
+        fields = ['id', 'name', 'details','timeline_Name']
 
 class CreateScrumSerializer(serializers.ModelSerializer):
     class Meta:
@@ -115,21 +128,88 @@ class CreateScrumSerializer(serializers.ModelSerializer):
         fields = ['timeline_Name', 'name', 'details']
 
     def create(self, validated_data):
+        timeline = validated_data.get('timeline_Name')
+        if timeline and timeline.assign:
+            validated_data['members'] = timeline.assign
+        
         return Scrum.objects.create(**validated_data)
 
+
 # * ================ This Serializer is for the Task ================ * #
+# class TaskCreationSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Task
+#         fields = ['scrum_Name', 'name', 'details', 'assign']
+#         read_only_fields = ['status', 'priority', 'which_Type', 'task_Value']
+
+#     def create(self, validated_data):
+#         validated_data['status'] = Task_Status.TO_DO
+#         validated_data['priority'] = TaskPriority.LOW
+#         validated_data['which_Type'] = TaskType.TASK
+#         validated_data['task_Value'] = None
+#         return super().create(validated_data)
+
+# serializers.py
+
+# serializers.py
 class TaskCreationSerializer(serializers.ModelSerializer):
+    assign = serializers.EmailField(write_only=True, required=False, allow_blank=True)
+
     class Meta:
         model = Task
-        fields = ['scrum_Name', 'name', 'details', 'assign']
-        read_only_fields = ['status', 'priority', 'which_Type', 'task_Value']
+        fields = ['scrum_Name', 'name', 'details', 'assign', 'which_Type']
+        read_only_fields = ['status', 'priority', 'task_Value']
+
+    def validate_assign(self, value):
+        if value:
+            try:
+                # Ensure case-insensitive email lookup
+                user = User.objects.get(email__iexact=value)
+            except User.DoesNotExist:
+                raise serializers.ValidationError("No user found with this email address.")
+            
+            # Check if the user is a member of the workspace related to the Task instance's Scrum's Timeline's Workspace
+            try:
+                scrum_id = self.initial_data.get('scrum_Name')
+                scrum = Scrum.objects.get(id=scrum_id)
+                timeline = scrum.timeline_Name
+                workspace = timeline.workspace_Name
+            except Scrum.DoesNotExist:
+                raise serializers.ValidationError("Scrum not found.")
+            except Timeline.DoesNotExist:
+                raise serializers.ValidationError("Timeline not found.")
+            except WorkSpace.DoesNotExist:
+                raise serializers.ValidationError("Workspace not found.")
+            except Exception as e:
+                raise serializers.ValidationError(str(e))
+
+            try:
+                member = Member.objects.get(user=user, workspace_Name=workspace)
+            except Member.DoesNotExist:
+                raise serializers.ValidationError("User is not a member of the workspace.")
+            
+            return member
+        return None
 
     def create(self, validated_data):
+        assign_member = validated_data.pop('assign', None)
+        if assign_member:
+            scrum = validated_data.get('scrum_Name')
+            if assign_member not in scrum.members.all():
+                scrum.members.add(assign_member)
+                print(f"Added member {assign_member.user.email} to scrum {scrum.name}")
+            else:
+                print(f"Member {assign_member.user.email} is already in scrum {scrum.name}")
+
+            validated_data['assign'] = assign_member
+        else:
+            print("No member assigned")
+
         validated_data['status'] = Task_Status.TO_DO
         validated_data['priority'] = TaskPriority.LOW
-        validated_data['which_Type'] = TaskType.TASK
         validated_data['task_Value'] = None
         return super().create(validated_data)
+
 
 class TaskDetailSerializer(serializers.ModelSerializer):
     assign = AssignedUserSerializer(read_only=True)
@@ -256,3 +336,13 @@ class WorkspaceDetailsForMembers(serializers.ModelSerializer):
 
     def get_workspace_total_members(self, obj):
         return Member.objects.filter(workspace_Name=obj).count()
+    
+
+class ScrumWithTasksSerializer(serializers.ModelSerializer):
+    tasks = TaskDetailSerializer(source='task_set', many=True, read_only=True)
+    timeline_name = serializers.CharField(source='timeline_Name.name', read_only=True)
+    assign = AssignedUserSerializer(source='timeline_Name.assign', read_only=True)
+
+    class Meta:
+        model = Scrum
+        fields = ['id', 'name', 'timeline_name', 'assign', 'tasks']
