@@ -181,3 +181,54 @@ class WorkspaceInsightsView(APIView):
         }
 
         return Response(data, status=status.HTTP_200_OK)
+    
+class WebsiteInsightsAPIView(APIView):
+
+    def get(self, request, format=None):
+        #Total users 
+        totalUsers=User.objects.count()
+        #Total Workspces 
+        totalWorkspaces=WorkSpace.objects.count()
+        # Total number of members
+        totalMembers = Member.objects.count()
+        
+        # Members with roles
+        members = {
+            'Associate Manager': Member.objects.filter(role='Associate Manager').count(),
+            'Team Leader': Member.objects.filter(role='Team Leader').count(),
+            'Member': Member.objects.filter(role='Member').count(),
+        }
+
+        # Total number of timelines
+        totalTimelines = Timeline.objects.count()
+
+        # Number of timelines based on status
+        timelines= {
+            'In Progress': Timeline.objects.filter(status='In Progress').count(),
+            'To Do': Timeline.objects.filter(status='To Do').count(),
+            'Testing': Timeline.objects.filter(status='Testing').count(),
+            'Done': Timeline.objects.filter(status='Done').count(),
+        }
+
+        # Total number of tasks
+        totalTasks = Task.objects.count()
+
+        # Number of tasks based on status
+        tasks= {
+            'In Progress': Task.objects.filter(status='In Progress').count(),
+            'To Do': Task.objects.filter(status='To Do').count(),
+            'Done': Task.objects.filter(status='Done').count(),
+        }
+
+        data = {
+            'totalUsers': totalUsers,
+            'totalWorkspaces': totalWorkspaces,
+            'totalMembers': totalMembers,
+            'members': members,
+            'totalTimelines': totalTimelines,
+            'timelines': timelines,
+            'totalTasks': totalTasks,
+            'tasks': tasks,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
