@@ -10,5 +10,6 @@ urlpatterns = [
     path('member/acivate/<uid64>/<token>/',ActivateMemberView.as_view(),name='active_member'),
     path('task/update-status/',ChangeStatusView.as_view(),name='change_task_status'),
     path('<int:pk>/details/',WorkSpaceDetailView.as_view(),name='workspace-details'),
-    path('insights/<int:workspace_id>/',WorkspaceInsightsView.as_view(),name='insights'),
+    path('insights/<int:workspace_id>/',WorkspaceInsightsView.as_view(),name='workspce-insights'),
+    
 ]
