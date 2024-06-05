@@ -39,9 +39,15 @@ class UserEducation(models.Model):
     
     def get_duration(self):
         if self.end_date:
-            return (self.end_date - self.start_date).days
-        return (date.today() - self.start_date).days
-    
+            duration = self.end_date - self.start_date
+        else:
+            duration = date.today() - self.start_date
+        
+        years = duration.days // 365
+        months = (duration.days % 365) // 30
+        days = (duration.days % 365) % 30
+        
+        return f"{years} years, {months} months, {days} days"
     def __str__(self):
         return f"{self.user.username}'s education {self.id}"
     
