@@ -229,7 +229,7 @@ class TaskDetailSerializer(serializers.ModelSerializer):
 class TaskAssignSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
 
-    class Meta: 
+    class Meta:
         model = Task
         fields = ['email']
 
@@ -255,10 +255,15 @@ class TaskAssignSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         member = validated_data['email']['member']
+        scrum = instance.scrum_Name
+
+        if member not in scrum.members.all():
+            scrum.members.add(member)
+        
         instance.assign = member
         instance.save()
         return instance
-    
+
 # * ================ This Serializer is for the Task ================ * #
 class TaskSerializerPriority(serializers.ModelSerializer):
     class Meta:
