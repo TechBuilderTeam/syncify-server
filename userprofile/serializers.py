@@ -11,3 +11,8 @@ class UserAboutSerializer(serializers.ModelSerializer):
     class Meta:
         model=UserAbout
         fields='__all__'
+        
+class UserPortfolioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=UserPortfolio
+        fields='__all__'

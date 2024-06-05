@@ -17,3 +17,12 @@ class UserAbout(models.Model):
     def __str__(self):
         return f"{self.user.username}'s about"
     
+class UserPortfolio(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    github=models.CharField(max_length=255,null=True,blank=True)
+    linkedin=models.CharField(max_length=255,null=True,blank=True)
+    portfolio=models.CharField(max_length=255,null=True,blank=True)
+    twitter=models.CharField(max_length=255,null=True,blank=True)
+    
+    def __str__(self):
+        return f"{self.user.username}'s portfolio"
