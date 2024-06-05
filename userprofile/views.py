@@ -43,3 +43,39 @@ class UserContactView(APIView):
             return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         except UserContact.DoesNotExist:
             return Response({"detail": "User contact not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        
+class UserAboutView(APIView):
+    def post(self,request):
+        uid=request.data.get('uid')
+        about=request.data.get('about')
+        
+        try:
+            user=User.objects.get(id=uid)
+            try:
+                user_about = UserAbout.objects.get(user=user)
+                # Update the existing user contact
+                user_about.about = about
+                user_about.save()
+                serializer = UserAboutSerializer(user_about)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except UserAbout.DoesNotExist:
+                # Create a new user contact
+                user_about = UserAbout(user=user, about=about)
+                user_about.save()
+                serializer = UserAboutSerializer(user_about)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    def get(self,request):
+        uid=request.data.get('uid')
+        try:
+            user=User.objects.get(id=uid)
+            user_about = UserAbout.objects.get(user=user)
+            serializer = UserAboutSerializer(user_about)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except UserAbout.DoesNotExist:
+            return Response({"detail": "User about not found"}, status=status.HTTP_404_NOT_FOUND)
