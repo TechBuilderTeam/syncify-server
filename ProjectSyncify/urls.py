@@ -17,4 +17,6 @@ urlpatterns = [
     
     # * ======= This API for Website Insights ====== *#
     path('api/v1/insights/',WebsiteInsightsAPIView.as_view(),name='website-insights'),
+    # * ======= This API for user profile ====== *#
+    path('api/v1/profile/',include('userprofile.urls')),
 ]
