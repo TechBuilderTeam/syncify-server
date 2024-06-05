@@ -160,6 +160,14 @@ class TimelineAssignUpdate(generics.UpdateAPIView):
             },
             status=status.HTTP_200_OK
         )
+    
+class TimelineGetDates(generics.ListAPIView):
+    serializer_class = TimelineDateSerializer
+
+    def get_queryset(self):
+        workspace_id = self.kwargs['workspace_id']
+        return Timeline.objects.filter(workspace_Name_id=workspace_id)
+    
 #* ============ View to check if a user is a member of a specific workspace ============ *# 
 class IsUserMember(APIView):
 

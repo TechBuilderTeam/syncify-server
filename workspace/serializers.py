@@ -1,7 +1,9 @@
+import collections.abc
 from rest_framework import serializers
 from .models import *
 from accounts.serializers import UserRegisterSerializer
 from datetime import date
+import collections
 
 # * ================ This Serializer is for the WorkSpace Creation ================ * #
 class WorkSpaceSerializer(serializers.ModelSerializer):
@@ -122,19 +124,23 @@ class ScrumSerializer(serializers.ModelSerializer):
         model = Scrum
         fields = ['id', 'name', 'details','timeline_Name']
 
+
 class CreateScrumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scrum
         fields = ['timeline_Name', 'name', 'details']
-
     def create(self, validated_data):
         timeline = validated_data.get('timeline_Name')
-        if timeline and timeline.assign:
-            validated_data['members'] = timeline.assign
-        
-        return Scrum.objects.create(**validated_data)
+        scrum = Scrum.objects.create(**validated_data) 
 
-
+        if timeline:
+            if hasattr(timeline,'assign'):
+                if isinstance(timeline.assign, collections.abc.Iterable):
+                    scrum.members.set(timeline.assign)
+                else:
+                    scrum.members.add(timeline.assign)
+        return scrum
+    
 # * ================ This Serializer is for the Task ================ * #
 # class TaskCreationSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -223,7 +229,7 @@ class TaskDetailSerializer(serializers.ModelSerializer):
 class TaskAssignSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
 
-    class Meta: 
+    class Meta:
         model = Task
         fields = ['email']
 
@@ -249,10 +255,15 @@ class TaskAssignSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         member = validated_data['email']['member']
+        scrum = instance.scrum_Name
+
+        if member not in scrum.members.all():
+            scrum.members.add(member)
+        
         instance.assign = member
         instance.save()
         return instance
-    
+
 # * ================ This Serializer is for the Task ================ * #
 class TaskSerializerPriority(serializers.ModelSerializer):
     class Meta:
@@ -346,3 +357,9 @@ class ScrumWithTasksSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scrum
         fields = ['id', 'name', 'timeline_name', 'assign', 'tasks']
+
+
+class TimelineDateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Timeline
+        fields = ['id', 'name', 'start_Date', 'end_Date']
