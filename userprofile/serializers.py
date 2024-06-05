@@ -41,3 +41,8 @@ class UserSkillSerializer(serializers.ModelSerializer):
     class Meta:
         model=UserSkill
         fields='__all__'
+        
+class UserDesignationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=UserDesignation
+        fields='__all__'
