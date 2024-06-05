@@ -42,25 +42,31 @@ class AssignedUserSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(source='user.last_name', read_only=True)
     email = serializers.EmailField(source='user.email', read_only=True)
     id = serializers.EmailField(source='user.id', read_only=True)
+    image = serializers.CharField(source='user.image', read_only=True)
 
     class Meta:
         model = Member
-        fields = ['id', 'first_name', 'last_name', 'email']
+        fields = ['id', 'first_name', 'last_name', 'email','image']
 
 class TimelineDetailSerializer(serializers.ModelSerializer):
     workspace_name = serializers.CharField(source='workspace_Name.name', read_only=True)
     assign = AssignedUserSerializer(read_only=True)
     remaining_time = serializers.SerializerMethodField()
+    scrum_id = serializers.SerializerMethodField() # Return scrum is created or not
 
     class Meta:
         model = Timeline
-        fields = ['id', 'name', 'details', 'start_Date', 'end_Date', 'workspace_name', 'assign', 'remaining_time', 'duration', 'status']
+        fields = ['id', 'name', 'details', 'start_Date', 'end_Date', 'workspace_name', 'assign', 'remaining_time', 'duration', 'status','scrum_id']
 
     def get_remaining_time(self, obj):
         if obj.end_Date:
             remaining_days = (obj.end_Date - date.today()).days
             return remaining_days if remaining_days >= 0 else 0
         return None
+    
+    def get_scrum_id(self, obj):
+        scrum = Scrum.objects.filter(timeline_Name=obj).first()  # Check if a Scrum exists for this timeline
+        return scrum.id if scrum else 0  # Return the Scrum ID if it exists, otherwise 0
     
 class TimelineStatusSerializer(serializers.ModelSerializer):
     class Meta:
