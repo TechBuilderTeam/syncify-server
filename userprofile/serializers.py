@@ -37,3 +37,7 @@ class UserWorkSerializer(serializers.ModelSerializer):
         return obj.get_duration()
     
     
+class UserSkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=UserSkill
+        fields='__all__'

@@ -211,3 +211,16 @@ class UserWorkListView(generics.ListAPIView):
         user_id = self.kwargs.get('user_id')
         user = get_object_or_404(User, id=user_id)
         return UserWork.objects.filter(user=user)
+    
+class UserSkillCreateView(generics.CreateAPIView):
+    serializer_class = UserSkillSerializer
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+class UserSkillListView(generics.ListAPIView):
+    serializer_class = UserSkillSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id')
+        return UserSkill.objects.filter(user_id=user_id)

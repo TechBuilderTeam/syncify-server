@@ -13,4 +13,6 @@ urlpatterns = [
     path('work/edit/<int:pk>/',UserWorkUpdateView.as_view(),name='user_Work_edit'),
     path('work/delete/<int:pk>/',UserWorkDeleteView.as_view(),name='user_Work_delete'),
     path('work/<int:user_id>/',UserWorkListView.as_view(),name='user_Work_list'),
+    path('skills/add/',UserSkillCreateView.as_view(),name='user_Skill'),
+    path('skills/<int:user_id>/',UserSkillListView.as_view(),name='user_SkillList'),
 ]
