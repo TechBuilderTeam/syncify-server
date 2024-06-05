@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'user',
     'chat',
     'workspace',
+    'userprofile',
 ]
 
 MIDDLEWARE = [
