@@ -9,7 +9,7 @@ from .serializers import *
 # Create your views here.
 class UserContactView(APIView):
     def post(self,request):
-        uid=request.data.get('uid')
+        uid=request.data.get('user')
         email=request.data.get('email')
         phone=request.data.get('phone')
         
@@ -33,7 +33,7 @@ class UserContactView(APIView):
             return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     
     def get(self,request):
-        uid=request.data.get('uid')
+        uid=request.data.get('user')
         try:
             user=User.objects.get(id=uid)
             user_contact = UserContact.objects.get(user=user)
@@ -47,7 +47,7 @@ class UserContactView(APIView):
         
 class UserAboutView(APIView):
     def post(self,request):
-        uid=request.data.get('uid')
+        uid=request.data.get('user')
         about=request.data.get('about')
         
         try:
@@ -69,7 +69,7 @@ class UserAboutView(APIView):
             return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     
     def get(self,request):
-        uid=request.data.get('uid')
+        uid=request.data.get('user')
         try:
             user=User.objects.get(id=uid)
             user_about = UserAbout.objects.get(user=user)
@@ -83,7 +83,7 @@ class UserAboutView(APIView):
         
 class UserPortfolioView(APIView):
     def post(self,request):
-        uid=request.data.get('uid')
+        uid=request.data.get('user')
         github=request.data.get('github')
         linkedin=request.data.get('linkedin')
         portfolio=request.data.get('portfolio')
@@ -111,7 +111,7 @@ class UserPortfolioView(APIView):
             return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     
     def get(self,request):
-        uid=request.data.get('uid')
+        uid=request.data.get('user')
         try:
             user=User.objects.get(id=uid)
             user_portfolio = UserPortfolio.objects.get(user=user)
@@ -227,7 +227,7 @@ class UserSkillListView(generics.ListAPIView):
     
 class UserDesignationView(APIView):
     def post(self,request):
-        uid=request.data.get('uid')
+        uid=request.data.get('user')
         designation=request.data.get('designation')
         
         try:
@@ -249,7 +249,7 @@ class UserDesignationView(APIView):
             return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     
     def get(self,request):
-        uid=request.data.get('uid')
+        uid=request.data.get('user')
         try:
             user=User.objects.get(id=uid)
             user_designatin = UserDesignation.objects.get(user=user)
