@@ -15,4 +15,5 @@ class UserAbout(models.Model):
     about=models.TextField(null=True,blank=True)
     
     def __str__(self):
-        pass
+        return f"{self.user.username}'s about"
+    
