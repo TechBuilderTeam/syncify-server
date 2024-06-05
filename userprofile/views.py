@@ -181,3 +181,33 @@ class UserEducationListView(generics.ListAPIView):
         user_id = self.kwargs.get('user_id')
         user = get_object_or_404(User, id=user_id)
         return UserEducation.objects.filter(user=user)
+    
+    
+class UserWorkCreateView(generics.CreateAPIView):
+    serializer_class = UserWorkSerializer
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+class UserWorkUpdateView(generics.UpdateAPIView):
+    serializer_class = UserWorkSerializer
+    lookup_field = 'pk'
+
+    def get_queryset(self):
+        return UserWork.objects.filter()
+
+class UserWorkDeleteView(generics.DestroyAPIView):
+    serializer_class = UserWorkSerializer
+    lookup_field = 'pk'
+
+    def get_queryset(self):
+        return UserWork.objects.filter()
+    
+    
+class UserWorkListView(generics.ListAPIView):
+    serializer_class = UserWorkSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id')
+        user = get_object_or_404(User, id=user_id)
+        return UserWork.objects.filter(user=user)

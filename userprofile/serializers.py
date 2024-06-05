@@ -27,3 +27,13 @@ class UserEducationSerializer(serializers.ModelSerializer):
         return obj.get_duration()
     
     
+class UserWorkSerializer(serializers.ModelSerializer):
+    duration = serializers.SerializerMethodField()
+    class Meta:
+        model=UserWork
+        fields=['id', 'user','company', 'position',  'start_date', 'end_date', 'description','currently_working' ,'duration']
+        
+    def get_duration(self, obj):
+        return obj.get_duration()
+    
+    
