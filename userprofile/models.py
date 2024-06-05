@@ -39,9 +39,46 @@ class UserEducation(models.Model):
     
     def get_duration(self):
         if self.end_date:
-            return (self.end_date - self.start_date).days
-        return (date.today() - self.start_date).days
-    
+            duration = self.end_date - self.start_date
+        else:
+            duration = date.today() - self.start_date
+        
+        years = duration.days // 365
+        months = (duration.days % 365) // 30
+        days = (duration.days % 365) % 30
+        
+        return f"{years} years, {months} months, {days} days"
     def __str__(self):
         return f"{self.user.username}'s education {self.id}"
+    
+    
+class UserWork(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    company=models.CharField(max_length=255)
+    position=models.CharField(max_length=255)
+    start_date=models.DateField()
+    end_date=models.DateField(null=True,blank=True)
+    currently_working=models.BooleanField(default=False)
+    description=models.TextField(blank=True,null=True)
+    
+    def get_duration(self):
+        if self.end_date:
+            duration = self.end_date - self.start_date
+        else:
+            duration = date.today() - self.start_date
+        
+        years = duration.days // 365
+        months = (duration.days % 365) // 30
+        days = (duration.days % 365) % 30
+        
+        return f"{years} years, {months} months, {days} days"
+    def __str__(self):
+        return f"{self.user.username}'s education {self.id}"
+    
+class UserSkill(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    name=models.CharField(max_length=255)
+    
+    def __str__(self):
+        return f"{self.user.username}'s skill {self.name}"
     

@@ -9,4 +9,10 @@ urlpatterns = [
     path('education/edit/<int:pk>/',UserEducationUpdateView.as_view(),name='user_education_edit'),
     path('education/delete/<int:pk>/',UserEducationDeleteView.as_view(),name='user_education_delete'),
     path('education/<int:user_id>/',UserEducationListView.as_view(),name='user_education_list'),
+    path('work/create/',UserWorkCreateView.as_view(),name='user_work_create'), 
+    path('work/edit/<int:pk>/',UserWorkUpdateView.as_view(),name='user_Work_edit'),
+    path('work/delete/<int:pk>/',UserWorkDeleteView.as_view(),name='user_Work_delete'),
+    path('work/<int:user_id>/',UserWorkListView.as_view(),name='user_Work_list'),
+    path('skills/add/',UserSkillCreateView.as_view(),name='user_Skill'),
+    path('skills/<int:user_id>/',UserSkillListView.as_view(),name='user_SkillList'),
 ]
