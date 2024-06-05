@@ -34,10 +34,11 @@ class WorkspaceMembers(serializers.ModelSerializer):
     user_id = serializers.ReadOnlyField(source='user.id')
     user_name = serializers.ReadOnlyField(source='user.get_full_name')
     user_email = serializers.ReadOnlyField(source='user.email')
+    user_image = serializers.ReadOnlyField(source='user.image')
 
     class Meta:
         model = Member
-        fields = ['user_id', 'user_name', 'user_email', 'role']
+        fields = ['user_id', 'user_name', 'user_email', 'role','user_image']
         
 class UpdateStatusSerializer(serializers.ModelSerializer):
     task_id=serializers.CharField(write_only=True,max_length=10)
