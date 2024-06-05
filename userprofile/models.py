@@ -82,3 +82,9 @@ class UserSkill(models.Model):
     def __str__(self):
         return f"{self.user.username}'s skill {self.name}"
     
+class UserDesignation(models.Model):
+    user=models.OneToOneField(User,on_delete=models.CASCADE)
+    designation=models.CharField(max_length=255)
+    
+    def __str__(self):
+        return f"{self.user.username}'s designation {self.designation}"

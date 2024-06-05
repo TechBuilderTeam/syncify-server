@@ -224,3 +224,39 @@ class UserSkillListView(generics.ListAPIView):
     def get_queryset(self):
         user_id = self.kwargs.get('user_id')
         return UserSkill.objects.filter(user_id=user_id)
+    
+class UserDesignationView(APIView):
+    def post(self,request):
+        uid=request.data.get('uid')
+        designation=request.data.get('designation')
+        
+        try:
+            user=User.objects.get(id=uid)
+            try:
+                user_designatin = UserDesignation.objects.get(user=user)
+                # Update the existing user contact
+                user_designatin.designatin = designation
+                user_designatin.save()
+                serializer = UserDesignationSerializer(user_designatin)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except UserDesignation.DoesNotExist:
+                # Create a new user contact
+                user_designatin = UserDesignation(user=user, designation=designation)
+                user_designatin.save()
+                serializer = UserDesignationSerializer(user_designatin)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    def get(self,request):
+        uid=request.data.get('uid')
+        try:
+            user=User.objects.get(id=uid)
+            user_designatin = UserDesignation.objects.get(user=user)
+            serializer = UserDesignationSerializer(user_designatin)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except UserDesignation.DoesNotExist:
+            return Response({"detail": "User designation not found"}, status=status.HTTP_404_NOT_FOUND)
+        
