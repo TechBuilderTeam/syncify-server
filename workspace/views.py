@@ -23,6 +23,25 @@ from rest_framework.exceptions import NotFound
 class workSpaceViewSet(viewsets.ModelViewSet):
     queryset =  WorkSpace.objects.all()
     serializer_class = WorkSpaceSerializer
+    
+    #overewrite method to handle deletion only when user is workspace manager
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()  # Get the WorkSpace instance
+        user_id = request.data.get('user_id')  # Extract user ID from the request data
+
+        if not user_id:
+            return Response({'error': 'User ID not provided.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the user ID matches the manager's ID
+        if instance.workSpace_manager_id != int(user_id):
+            return Response(
+                {'error': 'You do not have permission to delete this workspace.'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # If the user is the manager, proceed with deletion
+        return super().destroy(request, *args, **kwargs)
+    
 #* ======== Get Workspace name ====== #
 class WorkSpaceDetailView(generics.RetrieveAPIView):
     queryset = WorkSpace.objects.all()
