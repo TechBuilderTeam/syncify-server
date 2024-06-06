@@ -260,3 +260,9 @@ class UserDesignationView(APIView):
         except UserDesignation.DoesNotExist:
             return Response({"detail": "User designation not found"}, status=status.HTTP_404_NOT_FOUND)
         
+class UserProfileView(APIView):
+    def get(self, request, user_id):
+        user = get_object_or_404(User, pk=user_id)
+        serializer = UserProfileSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
