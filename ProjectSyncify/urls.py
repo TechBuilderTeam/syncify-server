@@ -13,7 +13,7 @@ urlpatterns = [
     path('api/v2/workspace/',include('workspace.urls2')),
     
     # * ======= This API for Chat ====== *#
-    path('api/v1/chats/',include('chats.urls')),
+    path('api/v1/chat/',include('chats.urls')),
     
     # * ======= This API for Website Insights ====== *#
     path('api/v1/insights/',WebsiteInsightsAPIView.as_view(),name='website-insights'),
