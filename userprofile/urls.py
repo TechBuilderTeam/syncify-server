@@ -16,4 +16,5 @@ urlpatterns = [
     path('skills/add/',UserSkillCreateView.as_view(),name='user_Skill'),
     path('skills/<int:user_id>/',UserSkillListView.as_view(),name='user_SkillList'),
     path('designation/',UserDesignationView.as_view(),name='designation'),
+    path('<int:user_id>/', UserProfileView.as_view(), name='user-profile'),
 ]

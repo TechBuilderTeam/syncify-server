@@ -46,3 +46,16 @@ class UserDesignationSerializer(serializers.ModelSerializer):
     class Meta:
         model=UserDesignation
         fields='__all__'
+        
+class UserProfileSerializer(serializers.ModelSerializer):
+    contact = UserContactSerializer(source='usercontact', read_only=True)
+    about = UserAboutSerializer(source='userabout', read_only=True)
+    portfolio = UserPortfolioSerializer(many=True, source='userportfolio_set', read_only=True)
+    education = UserEducationSerializer(many=True, source='usereducation_set', read_only=True)
+    work = UserWorkSerializer(many=True, source='userwork_set', read_only=True)
+    skills = UserSkillSerializer(many=True, source='userskill_set', read_only=True)
+    designation = UserDesignationSerializer(source='userdesignation', read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'get_full_name', 'email','designation','contact', 'about',  'portfolio', 'skills','education', 'work']

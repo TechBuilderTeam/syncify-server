@@ -216,7 +216,19 @@ class UserSkillCreateView(generics.CreateAPIView):
     serializer_class = UserSkillSerializer
 
     def perform_create(self, serializer):
-        serializer.save()
+        user = serializer.validated_data.get('user')
+        name = serializer.validated_data.get('name')
+
+        skill, created = UserSkill.objects.get_or_create(user=user, name=name)
+
+        if created:
+            serializer.instance = skill
+        else:
+            self.response = Response({'message': 'Skill already exists. No new skill created.'}, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        return getattr(self, 'response', response)
 
 class UserSkillListView(generics.ListAPIView):
     serializer_class = UserSkillSerializer
@@ -259,4 +271,10 @@ class UserDesignationView(APIView):
             return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         except UserDesignation.DoesNotExist:
             return Response({"detail": "User designation not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+class UserProfileView(APIView):
+    def get(self, request, user_id):
+        user = get_object_or_404(User, pk=user_id)
+        serializer = UserProfileSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
         
