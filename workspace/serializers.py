@@ -1,7 +1,9 @@
+import collections.abc
 from rest_framework import serializers
 from .models import *
 from accounts.serializers import UserRegisterSerializer
 from datetime import date
+import collections
 
 # * ================ This Serializer is for the WorkSpace Creation ================ * #
 class WorkSpaceSerializer(serializers.ModelSerializer):
@@ -40,25 +42,31 @@ class AssignedUserSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(source='user.last_name', read_only=True)
     email = serializers.EmailField(source='user.email', read_only=True)
     id = serializers.EmailField(source='user.id', read_only=True)
+    image = serializers.CharField(source='user.image', read_only=True)
 
     class Meta:
         model = Member
-        fields = ['id', 'first_name', 'last_name', 'email']
+        fields = ['id', 'first_name', 'last_name', 'email','image']
 
 class TimelineDetailSerializer(serializers.ModelSerializer):
     workspace_name = serializers.CharField(source='workspace_Name.name', read_only=True)
     assign = AssignedUserSerializer(read_only=True)
     remaining_time = serializers.SerializerMethodField()
+    scrum_id = serializers.SerializerMethodField() # Return scrum is created or not
 
     class Meta:
         model = Timeline
-        fields = ['id', 'name', 'details', 'start_Date', 'end_Date', 'workspace_name', 'assign', 'remaining_time', 'duration', 'status']
+        fields = ['id', 'name', 'details', 'start_Date', 'end_Date', 'workspace_name', 'assign', 'remaining_time', 'duration', 'status','scrum_id']
 
     def get_remaining_time(self, obj):
         if obj.end_Date:
             remaining_days = (obj.end_Date - date.today()).days
             return remaining_days if remaining_days >= 0 else 0
         return None
+    
+    def get_scrum_id(self, obj):
+        scrum = Scrum.objects.filter(timeline_Name=obj).first()  # Check if a Scrum exists for this timeline
+        return scrum.id if scrum else 0  # Return the Scrum ID if it exists, otherwise 0
     
 class TimelineStatusSerializer(serializers.ModelSerializer):
     class Meta:
@@ -122,19 +130,23 @@ class ScrumSerializer(serializers.ModelSerializer):
         model = Scrum
         fields = ['id', 'name', 'details','timeline_Name']
 
+
 class CreateScrumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scrum
         fields = ['timeline_Name', 'name', 'details']
-
     def create(self, validated_data):
         timeline = validated_data.get('timeline_Name')
-        if timeline and timeline.assign:
-            validated_data['members'] = timeline.assign
-        
-        return Scrum.objects.create(**validated_data)
+        scrum = Scrum.objects.create(**validated_data) 
 
-
+        if timeline:
+            if hasattr(timeline,'assign'):
+                if isinstance(timeline.assign, collections.abc.Iterable):
+                    scrum.members.set(timeline.assign)
+                else:
+                    scrum.members.add(timeline.assign)
+        return scrum
+    
 # * ================ This Serializer is for the Task ================ * #
 # class TaskCreationSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -223,7 +235,7 @@ class TaskDetailSerializer(serializers.ModelSerializer):
 class TaskAssignSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
 
-    class Meta: 
+    class Meta:
         model = Task
         fields = ['email']
 
@@ -249,10 +261,15 @@ class TaskAssignSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         member = validated_data['email']['member']
+        scrum = instance.scrum_Name
+
+        if member not in scrum.members.all():
+            scrum.members.add(member)
+        
         instance.assign = member
         instance.save()
         return instance
-    
+
 # * ================ This Serializer is for the Task ================ * #
 class TaskSerializerPriority(serializers.ModelSerializer):
     class Meta:
@@ -346,3 +363,9 @@ class ScrumWithTasksSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scrum
         fields = ['id', 'name', 'timeline_name', 'assign', 'tasks']
+
+
+class TimelineDateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Timeline
+        fields = ['id', 'name', 'start_Date', 'end_Date']

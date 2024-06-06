@@ -1,4 +1,4 @@
-
+from workspace.views2 import WebsiteInsightsAPIView
 from django.contrib import admin
 from django.urls import path,include
 
@@ -13,5 +13,10 @@ urlpatterns = [
     path('api/v2/workspace/',include('workspace.urls2')),
     
     # * ======= This API for Chat ====== *#
-    path('api/v1/chat/',include('chat.urls')),
+    path('api/v1/chat/',include('chats.urls')),
+    
+    # * ======= This API for Website Insights ====== *#
+    path('api/v1/insights/',WebsiteInsightsAPIView.as_view(),name='website-insights'),
+    # * ======= This API for user profile ====== *#
+    path('api/v1/profile/',include('userprofile.urls')),
 ]
