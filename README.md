@@ -155,5 +155,12 @@ more endpoints comming soon...
 <h3>Documentations that might help</h3>
 
 [📝 How to create a Pull Request](#)
-
+```bash
+git pull
+```
 [💾 Commit pattern](#)
+```bash
+git add .
+git commit -m"your commit title"
+git push
+```
