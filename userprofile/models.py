@@ -9,14 +9,14 @@ class UserContact(models.Model):
     email=models.EmailField(max_length=255,null=True,blank=True)
     
     def __str__(self) -> str:
-        return f'{self.user.username} - {self.phone} - {self.email}'
+        return f'{self.user.first_name} - {self.phone} - {self.email}'
     
 class UserAbout(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE)
     about=models.TextField(null=True,blank=True)
     
     def __str__(self):
-        return f"{self.user.username}'s about"
+        return f"{self.user.first_name}'s about"
     
 class UserPortfolio(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
@@ -26,7 +26,7 @@ class UserPortfolio(models.Model):
     twitter=models.CharField(max_length=255,null=True,blank=True)
     
     def __str__(self):
-        return f"{self.user.username}'s portfolio"
+        return f"{self.user.first_name}'s portfolio"
     
 class UserEducation(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
@@ -49,7 +49,7 @@ class UserEducation(models.Model):
         
         return f"{years} years, {months} months, {days} days"
     def __str__(self):
-        return f"{self.user.username}'s education {self.id}"
+        return f"{self.user.first_name}'s education {self.id}"
     
     
 class UserWork(models.Model):
@@ -73,18 +73,18 @@ class UserWork(models.Model):
         
         return f"{years} years, {months} months, {days} days"
     def __str__(self):
-        return f"{self.user.username}'s education {self.id}"
+        return f"{self.user.first_name}'s education {self.id}"
     
 class UserSkill(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     name=models.CharField(max_length=255)
     
     def __str__(self):
-        return f"{self.user.username}'s skill {self.name}"
+        return f"{self.user.first_name}'s skill {self.name}"
     
 class UserDesignation(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE)
     designation=models.CharField(max_length=255)
     
     def __str__(self):
-        return f"{self.user.username}'s designation {self.designation}"
+        return f"{self.user.first_name}'s designation {self.designation}"
