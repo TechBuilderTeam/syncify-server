@@ -82,8 +82,8 @@ Here you can list the main routes of your API, and what are their expected reque
 |----------------------|-----------------------------------------------------
 | <kbd>POST /api/v1/auth/register/</kbd>     | Register a new user [details](#get-auth-register-details)
 | <kbd>POST /api/v1/auth/login/</kbd>     | Login User [request details](#post-auth-detail)
-
-
+| <kbd>POST /api/v1/auth/verify-email/</kbd>     | Verify a user [details](#get-auth-register-details)
+| <kbd>POST /api/v1/auth/password-reset/</kbd>     | Password Reset [request details](#post-auth-detail)
 more endpoints comming soon...
 
 <h3 id="get-auth-register-details">POST /api/v1/auth/register/</h3>
