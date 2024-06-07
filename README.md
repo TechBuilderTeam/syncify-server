@@ -95,52 +95,48 @@ Here you can list the main routes of your API, and what are their expected reque
 | <kbd>GET /api/v1/user/unverified/</kbd>            | Get All Unverified Users      |
 | <kbd>GET /api/v1/user/details/{id}</kbd>           | Get User Details by ID        |
 | <kbd>GET /api/v1/user/details/{email}</kbd>        | Get User Details by Email     |
-| <kbd>POST /api/v2/workspace/members/add/</kbd>        | Add a member to a workspace                                |
-|                                                       | **Body:**<br>{<br> "workspace_Name": "id",<br> "role": "Associate Manager/Team Leader/Member",<br> "email": "example@mail.com"<br>}<br>**Response:**<br>201 with data, message -> success<br>400 with error -> user does not exist with this email, user is the manager of this workspace, and the user already exists |
-| <kbd>DELETE /api/v2/workspace/members/remove/</kbd>   | Remove a member from a workspace                           |
-|                                                       | **Body:**<br>{<br> "workspace_id": "4",<br> "user_id": "7"<br>}<br>**Response:**<br>200 with message -> success<br>404 with message -> member not found<br>400 with error -> workspace_id, user_id not provided |
-| <kbd>PUT/PATCH /api/v2/workspace/members/change-role/</kbd> | Change the role of a workspace member                       |
-|                                                       | **Body:**<br>{<br> "workspace_id": "4",<br> "new_role": "Associate Manager",<br> "user_id": "4"<br>}<br>**Response:**<br>200 with data -> success<br>404 with error -> member not found<br>400 with error -> all fields required |
-| <kbd>GET /api/v2/workspace/id/members/</kbd>          | Get a list of all members in a single workspace             |
-|                                                       | **Response:**<br>Each member's data: user_id, user_name, user_email, role |
-| <kbd>GET /api/v1/chat/groupname/</kbd>         | Get message history of a specific group|
-| <kbd>wss://projectsyncifyapi.onrender.com/ws/v1/chat/gp/</kbd> | WebSocket connection for chat      |
-| <kbd>GET /api/v2/workspace/insights/{id}/</kbd>  | Get insights for a specific workspace (replace {id} with your workspace ID) |
-| <kbd>GET /api/v1/insights/</kbd>  | Get website insights         |
-| <kbd>GET /api/v1/profile/designation/</kbd>                  | Get user designation                                    |
-|                                                              | **Body:**<br>{ "user": "user_id" }<br>**Response:**<br>200 ok, get designation<br>404 if user does not exist or designation is not created |
-| <kbd>POST /api/v1/profile/designation/</kbd>                 | Create or update user designation                       |
-|                                                              | **Body:**<br>{ "designation": "Backend Developer", "user": "user_id" }<br>**Response:**<br>200 ok, get designation<br>404 if user does not exist |
-| <kbd>GET /api/v1/profile/contact/</kbd>                      | Get user contact information                            |
-|                                                              | **Body:**<br>{ "user": "user_id" }<br>**Response:**<br>200 ok, get contact information<br>404 if user does not exist or contact is not created |
-| <kbd>POST /api/v1/profile/contact/</kbd>                     | Create or update user contact information               |
-|                                                              | **Body:**<br>{ "phone": "01767500160", "email": "najmulislamru@gmail.com", "user": "user_id" }<br>**Response:**<br>200 ok, get contact information<br>404 if user does not exist |
-| <kbd>GET /api/v1/profile/about/</kbd>                        | Get user about information                              |
-|                                                              | **Body:**<br>{ "user": "user_id" }<br>**Response:**<br>200 ok, get about information<br>404 if user does not exist or about is not created |
-| <kbd>POST /api/v1/profile/about/</kbd>                       | Create or update user about information                 |
-|                                                              | **Body:**<br>{ "about": "this is my about", "user": "user_id" }<br>**Response:**<br>200 ok, get about information<br>404 if user does not exist |
-| <kbd>GET /api/v1/profile/portfolio/</kbd>                    | Get user portfolio information                          |
-|                                                              | **Body:**<br>{ "user": "user_id" }<br>**Response:**<br>200 ok, get portfolio information<br>404 if user does not exist or portfolio is not created |
-| <kbd>POST /api/v1/profile/portfolio/</kbd>                   | Create or update user portfolio information             |
-|                                                              | **Body:**<br>{ "github": "github link", "linkedin": "LinkedIn link", "portfolio": "portfolio link", "twitter": "twitter link", "user": "user_id" }<br>**Response:**<br>200 ok, get portfolio information<br>404 if user does not exist |
-| <kbd>POST /api/v1/profile/education/create/</kbd>            | Add user education                                      |
-|                                                              | **Body:**<br>{ "user": null, "institution": "", "degree": "", "start_date": null, "end_date": null, "description": "", "currently_studying": false } |
-| <kbd>PUT /api/v1/profile/education/edit/{educationid}/</kbd> | Edit user education                                     |
-|                                                              | **Body:**<br>{ "user": null, "institution": "", "degree": "", "start_date": null, "end_date": null, "description": "", "currently_studying": false }<br>**Response:**<br>Update |
-| <kbd>DELETE /api/v1/profile/education/delete/{educationid}/</kbd>| Delete user education                                   |
-|                                                              | **Response:**<br>Delete a specific education |
-| <kbd>GET /api/v1/profile/education/{userid}/</kbd>           | Get all education of a user                             |
-|                                                              | **Response:**<br>Get a user all education list |
-| <kbd>POST /api/v1/profile/work/create/</kbd>                 | Add user work experience                                |
-|                                                              | **Body:**<br>{ "user": null, "company": "", "position": "", "start_date": null, "end_date": null, "description": "", "currently_working": false } |
-| <kbd>PUT /api/v1/profile/work/edit/{workid}/</kbd>           | Edit user work experience                               |
-|                                                              | **Body:**<br>{ "user": null, "company": "", "position": "", "start_date": null, "end_date": null, "description": "", "currently_working": false } |
-| <kbd>DELETE /api/v1/profile/work/delete/{workid}/</kbd>      | Delete user work experience                             |
-|                                                              | **Response:**<br>Delete a specific work |
-| <kbd>GET /api/v1/profile/work/{userid}/</kbd>                | Get all work experience of a user                       |
-|                                                              | **Response:**<br>Get a user all work list |
-| <kbd>POST /api/v1/profile/skills/add/</kbd>                  | Add user skills |
-
+| <kbd>POST /api/v2/workspace/members/add/</kbd>        | Add a member to a workspace        
+| <kbd>GET /api/v1/profile/designation/</kbd>            | Get user designation       |
+| <kbd>POST /api/v1/profile/designation/</kbd>           | Create or update user designation |
+| <kbd>GET /api/v1/profile/contact/</kbd>                | Get user contact information |
+| <kbd>POST /api/v1/profile/contact/</kbd>               | Create or update user contact |
+| <kbd>GET /api/v1/profile/about/</kbd>                  | Get user about information |
+| <kbd>POST /api/v1/profile/about/</kbd>                 | Create or update user about |
+| <kbd>GET /api/v1/profile/portfolio/</kbd>             | Get user portfolio information |
+| <kbd>POST /api/v1/profile/portfolio/</kbd>            | Create or update user portfolio |
+| <kbd>POST /api/v1/profile/education/create/</kbd>     | Add user education |
+| <kbd>PUT /api/v1/profile/education/edit/{educationid}/</kbd> | Edit user education |
+| <kbd>DELETE /api/v1/profile/education/delete/{educationid}/</kbd> | Delete user education |
+| <kbd>GET /api/v1/profile/education/{userid}/</kbd>     | Get all education of a user |
+| <kbd>POST /api/v1/profile/work/create/</kbd>           | Add user work experience |
+| <kbd>PUT /api/v1/profile/work/edit/{workid}/</kbd>     | Edit user work experience |
+| <kbd>DELETE /api/v1/profile/work/delete/{workid}/</kbd> | Delete user work experience |
+| <kbd>GET /api/v1/profile/work/{userid}/</kbd>          | Get all work experience of a user |
+| <kbd>POST /api/v1/profile/skills/add/</kbd>           | Add user skills |
+| <kbd>POST /workspace/scrum/create/</kbd>     | Create Scrum
+| <kbd>GET /workspace/scrum/{scrum_id}/</kbd>     | Get Single Scrum
+| <kbd>PUT /workspace/scrum/update/{scrum_id}/</kbd>     | Update Scrum
+| <kbd>DELETE /workspace/scrum/delete/{scrum_id}/</kbd>     | Delete Scrum
+| <kbd>GET /workspace/timeline/scrum/{timeline_id}/</kbd>     | Get All Scrums in Timeline
+| <kbd>GET /workspace/user/{user_id}/workspace/{workspace_id}/scrums/</kbd>     | Get All Scrums for User
+| <kbd>POST /workspace/tasks/create/</kbd>     | Create Task
+| <kbd>GET /workspace/tasks/{task_id}/</kbd>     | Get Single Task
+| <kbd>PUT /workspace/tasks/update/{task_id}/</kbd>     | Update Task
+| <kbd>DELETE /workspace/tasks/delete/{task_id}/</kbd>     | Delete Task
+| <kbd>GET /workspace/scrum/tasks/list/{scrum_id}/</kbd>     | Get All Tasks in Single Scrum
+| <kbd>PUT /workspace/task/update/priority/{task_id}/</kbd>     | Change Task Priority
+| <kbd>PUT /workspace/task/update/status/{task_id}/</kbd>     | Change Task Status
+| <kbd>PUT /workspace/task/update/assign/{task_id}/</kbd>     | Change Task Assign Member
+| <kbd>PUT /api/v2/workspace/task/update-status/</kbd>     | Update Task Status
+| <kbd>GET /workspace/user/{user_id}/workspace/{workspace_id}/tasks/</kbd>     | Get All Tasks for User
+| <kbd>POST /workspace/comments/create/</kbd>     | Create Comment
+| <kbd>GET /workspace/comments/{comments_id}/</kbd>     | Get Single Comment
+| <kbd>PUT /workspace/comments/update/{comments_id}/</kbd>     | Update Comment
+| <kbd>DELETE /workspace/comments/delete/{comments_id}/</kbd>     | Delete Comment
+| <kbd>GET /workspace/workspace/singletask/comments/list/{task_id}/</kbd>     | Get All Comments in Single Task
+| <kbd>GET /workspace/counts/</kbd>     | Get All Counts for Website
+| <kbd>GET /workspace/dashbordinfo/{workspace_id}/</kbd>     | Get Dashboard Info
+| <kbd>GET /workspace/pdf/{workspace_id}/</kbd>     | Export Whole Project
 more endpoints comming soon...
 
 <h3 id="get-auth-register-details">POST /api/v1/auth/register/</h3>
