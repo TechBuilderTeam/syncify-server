@@ -24,7 +24,9 @@ list of all technologies we used
 - Django REST Framework
 - PyJWT
 - Google Auth
-- SQLite
+- Django Channels
+- PostgreSQL
+- Redis
  
 <h2 id="started">🚀 Getting started</h2>
 
