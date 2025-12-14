@@ -27,6 +27,7 @@ DEBUG = True
 
 INSTALLED_APPS = [
     "daphne",
+    'accounts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -34,7 +35,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_filters',
-    'accounts',
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
@@ -94,11 +94,11 @@ ASGI_APPLICATION = 'ProjectSyncify.asgi.application'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'sifathislam790$default',  # Your database name
-#         'USER': 'sifathislam790',           # Your database username
-#         'PASSWORD': 'sifath2002',           # Your database password
-#         'HOST': 'sifathislam790.mysql.pythonanywhere-services.com',  # Your database host
-#         'PORT': '3306',                     # The default MySQL port
+#         'NAME': env('DATABASE_NAME'), 
+#         'USER': env('DATABASE_USER'),         
+#         'PASSWORD': env('DATABASE_PASSWORD'),        
+#         'HOST': env('DATABASE_HOST'),  
+#         'PORT': '3306',                     
 #     }
 # }
 
@@ -214,7 +214,7 @@ CHANNEL_LAYERS = {
 #     }
 # }
 
-DATABASE_URL='postgres://teamtechbuilders:1jD2SscWh3VtGMvep3cDeg4haREjykS5@dpg-cpcmb663e1ms73f092k0-a.oregon-postgres.render.com/syncify'
+DATABASE_URL=env("DATABASE_URL")
 DATABASES = {
-	"default": dj_database_url.parse("postgres://teamtechbuilders:1jD2SscWh3VtGMvep3cDeg4haREjykS5@dpg-cpcmb663e1ms73f092k0-a.oregon-postgres.render.com/syncify")
+	"default": dj_database_url.parse(DATABASE_URL)
 }
